@@ -6,13 +6,13 @@ export const createUser = (req: Request, res: Response) => {
 
   return User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
+    .catch(() => res.status(400).send({ message: "Некорректные данные" }));
 };
 
 export const getUsers = (req: Request, res: Response) => {
   return User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
+    .catch(() => res.status(404).send({ message: "Пользователи не найдены" }));
 };
 
 export const getUserById = (req: Request, res: Response) => {
@@ -20,5 +20,5 @@ export const getUserById = (req: Request, res: Response) => {
 
   return User.findById(id)
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: "Error" }));
+    .catch(() => res.status(404).send({ message: "Пользователь не найден" }));
 };
