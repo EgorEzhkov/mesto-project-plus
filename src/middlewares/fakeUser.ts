@@ -1,14 +1,12 @@
-import { UserRequest } from "types/types";
-import { Response, NextFunction } from "express";
+import { Response, NextFunction } from 'express';
+import { UserRequest } from '../types/types';
 
-export const fakeUser = (
-  req: UserRequest,
-  res: Response,
-  next: NextFunction
-) => {
+const fakeUser = (req: UserRequest, res: Response, next: NextFunction) => {
   req.user = {
-    _id: "65faeda3750ff8eb846538d3",
+    _id: '65faeda3750ff8eb846538d3',
   };
 
   next();
 };
+
+export default fakeUser;
