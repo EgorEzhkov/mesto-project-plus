@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { UserRequest } from '../types/types';
 import User from '../models/user';
 
 export const createUser = async (req: Request, res: Response) => {
@@ -29,5 +30,31 @@ export const getUserById = async (req: Request, res: Response) => {
     return res.send({ data: user });
   } catch {
     return res.status(404).send({ message: 'Пользователь не найден' });
+  }
+};
+
+export const updateUser = async (req: UserRequest, res: Response) => {
+  const { name, about } = req.body;
+
+  const id = req.user?._id;
+
+  try {
+    const user = await User.findByIdAndUpdate(id, { name, about }, { new: true });
+    return res.send({ data: user });
+  } catch {
+    return res.status(400).send({ message: 'Некорректные данные' });
+  }
+};
+
+export const updateAvatar = async (req: UserRequest, res: Response) => {
+  const { avatar } = req.body;
+
+  const id = req.user?._id;
+
+  try {
+    const user = await User.findByIdAndUpdate(id, { avatar }, { new: true });
+    return res.send({ data: user });
+  } catch {
+    return res.status(400).send({ message: 'Некорректные данные' });
   }
 };

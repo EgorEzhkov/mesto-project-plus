@@ -33,3 +33,43 @@ export const deleteCard = async (req: Request, res: Response) => {
     return res.status(404).send({ message: 'Карточка не найдена' });
   }
 };
+
+export const likeCard = async (req: UserRequest, res: Response) => {
+  const { cardId } = req.params;
+
+  const userId = req.user?._id;
+
+  try {
+    const card = await Card.findByIdAndUpdate(
+      cardId,
+      { $addToSet: { likes: userId } },
+      { new: true },
+    );
+
+    if (!card) {
+      return res.status(404).send({ message: 'Карточка не найдена' });
+    }
+
+    return res.send({ data: card });
+  } catch {
+    return res.status(500).send({ message: 'На сервере произошла ошибка' });
+  }
+};
+
+export const deletelikeCard = async (req: UserRequest, res: Response) => {
+  const { cardId } = req.params;
+
+  const userId = req.user?._id;
+
+  try {
+    const card = await Card.findByIdAndUpdate(cardId, { $pull: { likes: userId } }, { new: true });
+
+    if (!card) {
+      return res.status(404).send({ message: 'Карточка не найдена' });
+    }
+
+    return res.send({ data: card });
+  } catch {
+    return res.status(500).send({ message: 'На сервере произошла ошибка' });
+  }
+};
