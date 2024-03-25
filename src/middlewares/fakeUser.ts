@@ -3,7 +3,7 @@ import { UserRequest } from '../types/types';
 
 const fakeUser = (req: UserRequest, res: Response, next: NextFunction) => {
   req.user = {
-    _id: '65faeda3750ff8eb846538d3',
+    _id: '6601791d87a0dc85289e6088',
   };
 
   next();

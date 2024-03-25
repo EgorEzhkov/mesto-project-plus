@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import userRouter from './routes/users';
 import cardRouter from './routes/cards';
 import fakeUser from './middlewares/fakeUser';
+import error from './middlewares/error';
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -17,6 +18,8 @@ app.use(fakeUser);
 
 app.use('/', userRouter);
 app.use('/', cardRouter);
+
+app.use(error);
 
 app.listen(PORT, () => {
   console.log(`Порт сервера: ${PORT} `);
