@@ -9,9 +9,18 @@ export const createCard = async (req: UserRequest, res: Response, next: NextFunc
 
   try {
     const card = await Card.create({ name, link, owner });
-    return res.send({ data: card });
-  } catch {
-    return next(new errors.Error(errors.badRequestError, 'Некорректные данные'));
+
+    if (!name || !link) {
+      throw new errors.Error(errors.badRequestError, 'Некорректные данные');
+    }
+
+    return res.status(201).send({ data: card });
+  } catch (err: any) {
+    if (err.name === 'CastError') {
+      return next(new errors.Error(errors.notFoundError, 'Некорректный id пользователя'));
+    } else {
+      return next(err);
+    }
   }
 };
 
@@ -36,8 +45,12 @@ export const deleteCard = async (req: Request, res: Response, next: NextFunction
     const card = await Card.findByIdAndRemove(cardId);
 
     return res.send({ data: card });
-  } catch {
-    return next(new errors.Error(errors.notFoundError, 'Карточка не найдена'));
+  } catch (err: any) {
+    if (err.name === 'CastError') {
+      return next(new errors.Error(errors.notFoundError, 'Некорректный id карточки'));
+    } else {
+      return next(new errors.Error(errors.notFoundError, 'Карточка не найдена'));
+    }
   }
 };
 
@@ -54,11 +67,15 @@ export const likeCard = async (req: UserRequest, res: Response, next: NextFuncti
 
     return res.send({ data: card });
   } catch (err: any) {
-    return next(
-      err.messageFormat === undefined
-        ? new errors.Error(errors.notFoundError, 'Карточка не найдена')
-        : err,
-    );
+    if (err.name === 'CastError') {
+      return next(new errors.Error(errors.notFoundError, 'Некорректный id карточки'));
+    } else {
+      return next(
+        err.messageFormat === undefined
+          ? new errors.Error(errors.notFoundError, 'Карточка не найдена')
+          : err,
+      );
+    }
   }
 };
 
@@ -76,10 +93,14 @@ export const deletelikeCard = async (req: UserRequest, res: Response, next: Next
 
     return res.send({ data: card });
   } catch (err: any) {
-    return next(
-      err.messageFormat === undefined
-        ? new errors.Error(errors.notFoundError, 'Карточка не найдена')
-        : err,
-    );
+    if (err.name === 'CastError') {
+      return next(new errors.Error(errors.notFoundError, 'Некорректный id карточки'));
+    } else {
+      return next(
+        err.messageFormat === undefined
+          ? new errors.Error(errors.notFoundError, 'Карточка не найдена')
+          : err,
+      );
+    }
   }
 };

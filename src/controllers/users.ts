@@ -8,15 +8,25 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 
   try {
     const user = await User.create({ name, about, avatar });
-    return res.send({ data: user });
-  } catch {
-    return next(new errors.Error(errors.badRequestError, 'Некорректные данные'));
+
+    if (!name || !about || !avatar) {
+      throw new errors.Error(errors.badRequestError, 'Некорректные данные');
+    }
+
+    return res.status(201).send({ data: user });
+  } catch (err: any) {
+    if (err.name === 'ValidationError') {
+      return next(new errors.Error(errors.badRequestError, 'Некорректные данные')); // обрабатываем ошибку валидации
+    } else {
+      return next(err);
+    }
   }
 };
 
 export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const users = await User.find({});
+
     if (!users || users.length < 1) {
       throw new errors.Error(errors.notFoundError, 'Пользователи не найдены');
     }
@@ -44,7 +54,11 @@ export const updateUser = async (req: UserRequest, res: Response, next: NextFunc
   const id = req.user?._id;
 
   try {
-    const user = await User.findByIdAndUpdate(id, { name, about }, { new: true });
+    const user = await User.findByIdAndUpdate(
+      id,
+      { name, about },
+      { new: true, runValidators: true },
+    );
 
     if (!user) {
       throw new errors.Error(errors.notFoundError, 'Пользователь не найден');
@@ -55,8 +69,12 @@ export const updateUser = async (req: UserRequest, res: Response, next: NextFunc
     }
 
     return res.send({ data: user });
-  } catch (err) {
-    return next(err);
+  } catch (err: any) {
+    if (err.name === 'ValidationError') {
+      return next(new errors.Error(errors.badRequestError, 'Некорректные данные')); // обрабатываем ошибку валидации
+    } else {
+      return next(err);
+    }
   }
 };
 
@@ -66,7 +84,11 @@ export const updateAvatar = async (req: UserRequest, res: Response, next: NextFu
   const id = req.user?._id;
 
   try {
-    const user = await User.findByIdAndUpdate(id, { avatar }, { new: true });
+    const user = await User.findByIdAndUpdate(
+      id,
+      { avatar },
+      { new: true, runValidators: true },
+    );
 
     if (!user) {
       throw new errors.Error(errors.notFoundError, 'Пользователь не найден');
@@ -77,7 +99,11 @@ export const updateAvatar = async (req: UserRequest, res: Response, next: NextFu
     }
 
     return res.send({ data: user });
-  } catch (err) {
-    return next(err);
+  } catch (err: any) {
+    if (err.name === 'ValidationError') {
+      return next(new errors.Error(errors.badRequestError, 'Некорректные данные')); // обрабатываем ошибку валидации
+    } else {
+      return next(err);
+    }
   }
 };

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import validator from 'validator';
 
 interface Card {
   name: string;
@@ -8,31 +9,38 @@ interface Card {
   createdAd: Date;
 }
 
-const cardScheme = new mongoose.Schema<Card>({
-  name: {
-    required: true,
-    type: String,
-    minlength: 2,
-    maxlength: 30,
+const cardScheme = new mongoose.Schema<Card>(
+  {
+    name: {
+      type: String,
+      required: [true, 'Поле "name" должно быть заполнено'],
+      minlength: [2, 'Минимальная длина поля "name" - 2'],
+      maxlength: [30, 'Максимальная длина поля "name" - 30'],
+    },
+    link: {
+      required: [true, 'Поле "link" должно быть заполнено'],
+      type: String,
+      validate: {
+        validator: (v: string) => validator.isURL(v),
+        message: 'Некорректный URL',
+      },
+    },
+    owner: {
+      required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ownerCard',
+    },
+    likes: {
+      default: [],
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'users',
+    },
+    createdAd: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  link: {
-    required: true,
-    type: String,
-  },
-  owner: {
-    required: true,
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'ownerCard',
-  },
-  likes: {
-    default: [],
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'users',
-  },
-  createdAd: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { versionKey: false },
+);
 
 export default mongoose.model<Card>('card', cardScheme);
