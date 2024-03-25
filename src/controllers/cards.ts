@@ -16,8 +16,8 @@ export const createCard = async (req: UserRequest, res: Response, next: NextFunc
 
     return res.status(201).send({ data: card });
   } catch (err: any) {
-    if (err.name === 'CastError') {
-      return next(new errors.Error(errors.notFoundError, 'Некорректный id пользователя'));
+    if (err.name === 'ValidationError') {
+      return next(new errors.Error(errors.badRequestError, 'Некорректые данные'));
     } else {
       return next(err);
     }
@@ -44,12 +44,16 @@ export const deleteCard = async (req: Request, res: Response, next: NextFunction
   try {
     const card = await Card.findByIdAndRemove(cardId);
 
+    if (!card) {
+      throw new errors.Error(errors.notFoundError, 'Карточка не найдена');
+    }
+
     return res.send({ data: card });
   } catch (err: any) {
     if (err.name === 'CastError') {
       return next(new errors.Error(errors.notFoundError, 'Некорректный id карточки'));
     } else {
-      return next(new errors.Error(errors.notFoundError, 'Карточка не найдена'));
+      return next(err);
     }
   }
 };
@@ -62,19 +66,19 @@ export const likeCard = async (req: UserRequest, res: Response, next: NextFuncti
     const card = await Card.findByIdAndUpdate(
       cardId,
       { $addToSet: { likes: userId } },
-      { new: true },
+      { new: true }
     );
+
+    if (!card) {
+      throw new errors.Error(errors.notFoundError, 'Карточка не найдена');
+    }
 
     return res.send({ data: card });
   } catch (err: any) {
     if (err.name === 'CastError') {
       return next(new errors.Error(errors.notFoundError, 'Некорректный id карточки'));
     } else {
-      return next(
-        err.messageFormat === undefined
-          ? new errors.Error(errors.notFoundError, 'Карточка не найдена')
-          : err,
-      );
+      return next(err);
     }
   }
 };
@@ -88,19 +92,19 @@ export const deletelikeCard = async (req: UserRequest, res: Response, next: Next
     const card = await Card.findByIdAndUpdate(
       cardId,
       { $pull: { likes: userId } },
-      { new: true },
+      { new: true }
     );
+
+    if (!card) {
+      throw new errors.Error(errors.notFoundError, 'Карточка не найдена');
+    }
 
     return res.send({ data: card });
   } catch (err: any) {
     if (err.name === 'CastError') {
       return next(new errors.Error(errors.notFoundError, 'Некорректный id карточки'));
     } else {
-      return next(
-        err.messageFormat === undefined
-          ? new errors.Error(errors.notFoundError, 'Карточка не найдена')
-          : err,
-      );
+      return next(err);
     }
   }
 };
