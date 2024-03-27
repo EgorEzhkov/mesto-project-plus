@@ -1,4 +1,5 @@
 const badRequestError = 400;
+const logInError = 401;
 const notFoundError = 404;
 const defaultError = 500;
 
@@ -14,6 +15,7 @@ class Error {
 export default {
   badRequestError,
   notFoundError,
+  logInError,
   defaultError,
   Error,
 };

@@ -1,15 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { UserRequest } from '../types/types';
 import User from '../models/user';
 import errors from '../errors/errors';
 
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
-  const { name, about, avatar } = req.body;
+  const { name, about, avatar, email, password } = req.body;
 
   try {
-    const user = await User.create({ name, about, avatar });
+    const user = await bcrypt
+      .hash(password, 10)
+      .then((hash) => User.create({ name, about, avatar, email, password: hash }));
 
-    if (!name || !about || !avatar) {
+    if (!email || !password) {
       throw new errors.Error(errors.badRequestError, 'Некорректные данные');
     }
 
@@ -17,6 +21,8 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
   } catch (err: any) {
     if (err.name === 'ValidationError') {
       return next(new errors.Error(errors.badRequestError, 'Некорректные данные')); // обрабатываем ошибку валидации
+    } else if (err.message === 'Illegal arguments: undefined, number') {
+      return next(new errors.Error(errors.badRequestError, 'Введите пароль'));
     } else {
       return next(err);
     }
@@ -114,5 +120,42 @@ export const updateAvatar = async (req: UserRequest, res: Response, next: NextFu
     } else {
       return next(err);
     }
+  }
+};
+
+export const login = async (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      throw new errors.Error(errors.logInError, 'Неверный логин или пароль');
+    }
+
+    const token = jwt.sign({ _id: user._id }, 'secret-key', { expiresIn: '7d' });
+
+    return bcrypt
+      .compare(password, user.password)
+      .then((matched) => {
+        if (!matched) {
+          throw new errors.Error(errors.logInError, 'Неверный логин или пароль');
+        }
+        res
+          .cookie('authorization', token, {
+            maxAge: 3600000 * 24 * 7,
+            httpOnly: true,
+          })
+          .send({ message: 'Вы успешно вошли' });
+      })
+      .catch((err) => {
+        if (err.message === 'Illegal arguments: undefined, string') {
+          return next(new errors.Error(errors.badRequestError, 'Введите пароль'));
+        } else {
+          return next(err);
+        }
+      });
+  } catch (err: any) {
+    return next(err);
   }
 };
