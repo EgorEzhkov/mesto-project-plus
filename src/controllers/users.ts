@@ -142,7 +142,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
           throw new errors.Error(errors.logInError, 'Неверный логин или пароль');
         }
         res
-          .cookie('authorization', token, {
+          .cookie('jwt', token, {
             maxAge: 3600000 * 24 * 7,
             httpOnly: true,
           })

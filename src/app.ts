@@ -23,7 +23,7 @@ app.use(fakeUser);
 
 app.use('/', signInUp);
 
-app.use(auth);
+app.use(auth)
 
 app.use('/', userRouter);
 app.use('/', cardRouter);
