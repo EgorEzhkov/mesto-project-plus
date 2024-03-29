@@ -159,3 +159,19 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     return next(err);
   }
 };
+
+export const getUser = async (req: UserRequest, res: Response, next: NextFunction) => {
+  const { _id } = req.user!;
+
+  try {
+    const user = await User.findById(_id);
+
+    if (!user) {
+      throw new errors.Error(errors.notFoundError, 'Пользователь не найден');
+    }
+
+    res.send({ info: user });
+  } catch (err) {
+    next(err);
+  }
+};

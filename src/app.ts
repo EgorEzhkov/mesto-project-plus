@@ -4,7 +4,6 @@ import helmet from 'helmet';
 import userRouter from './routes/users';
 import cardRouter from './routes/cards';
 import signInUp from './routes/signUpIn';
-import fakeUser from './middlewares/fakeUser';
 import error, { notFoundAdress } from './middlewares/error';
 import auth from './middlewares/auth';
 
@@ -19,11 +18,9 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(fakeUser);
-
 app.use('/', signInUp);
 
-app.use(auth)
+app.use(auth);
 
 app.use('/', userRouter);
 app.use('/', cardRouter);
