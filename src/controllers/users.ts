@@ -127,14 +127,14 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
       throw new errors.Error(errors.logInError, 'Неверный логин или пароль');
     }
 
     const token = jwt.sign({ _id: user._id }, 'secret-key', { expiresIn: '7d' });
-
+    console.log(user.password);
     return bcrypt
       .compare(password, user.password)
       .then((matched) => {

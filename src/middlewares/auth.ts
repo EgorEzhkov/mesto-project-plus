@@ -16,7 +16,6 @@ export default async (req: AuthRequest, res: Response, next: NextFunction) => {
 
   try {
     payload = jwt.verify(token, 'secret-key');
-    console.log(payload)
   } catch (err) {
     next(new errors.Error(errors.logInError, 'Необходима авторизация!'));
   }
