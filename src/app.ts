@@ -7,6 +7,7 @@ import signInUp from './routes/signUpIn';
 import error, { notFoundAdress } from './middlewares/error';
 import auth from './middlewares/auth';
 import logger from './middlewares/logger';
+import { errors } from 'celebrate';
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -31,6 +32,8 @@ app.use('/', cardRouter);
 app.use('*', notFoundAdress);
 
 app.use(logger.errorLogger);
+
+app.use(errors());
 
 app.use(error);
 

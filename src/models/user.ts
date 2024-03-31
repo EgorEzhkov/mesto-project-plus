@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
+import validation from '../utils/validation';
 
 interface User {
   name: string;
@@ -30,18 +31,18 @@ const userSchema = new mongoose.Schema<User>(
       default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
       type: String,
       validate: {
-        validator: (v: string) => validator.isURL(v),
+        validator: (v: string) => validation.regUrl.test(v),
         message: 'Некорректный URL',
       },
     },
     email: {
+      unique: true,
       required: [true, 'Поле "email" должно быть заполнено'],
       type: String,
       validate: {
         validator: (v: string) => validator.isEmail(v),
         message: 'Некорректный email',
       },
-      unique: true,
       minlength: [2, 'Минимальная длина поля "name" - 2'],
       maxlength: [30, 'Максимальная длина поля "name" - 30'],
     },
@@ -52,6 +53,7 @@ const userSchema = new mongoose.Schema<User>(
       select: false,
     },
   },
+
   { versionKey: false }
 );
 
