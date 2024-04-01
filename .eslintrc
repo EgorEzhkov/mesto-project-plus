@@ -30,6 +30,8 @@
     "linebreak-style": 0,
     "no-underscore-dangle": ["error", { "allow": ["_id"] }],
     "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
-    "no-else-return": "off"
+    "no-else-return": "off",
+    "object-curly-newline": "off",
+    "newline-per-chained-call": "off"
   }
 }

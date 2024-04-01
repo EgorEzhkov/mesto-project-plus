@@ -38,17 +38,23 @@ export const getCards = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
-export const deleteCard = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteCard = async (req: UserRequest, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
 
   try {
-    const card = await Card.findByIdAndRemove(cardId);
+    const card = await Card.findById(cardId);
 
     if (!card) {
       throw new errors.Error(errors.notFoundError, 'Карточка не найдена');
     }
 
-    return res.send({ data: card });
+    if (String(card.owner) !== req.user!._id) {
+      throw new errors.Error(errors.logInError, 'У вас нет доступа удалять чужие карточки');
+    }
+
+    const cardDeleted = await card.delete();
+
+    return res.send({ data: cardDeleted });
   } catch (err: any) {
     if (err.name === 'CastError') {
       return next(new errors.Error(errors.notFoundError, 'Некорректный id карточки'));
@@ -66,7 +72,7 @@ export const likeCard = async (req: UserRequest, res: Response, next: NextFuncti
     const card = await Card.findByIdAndUpdate(
       cardId,
       { $addToSet: { likes: userId } },
-      { new: true }
+      { new: true },
     );
 
     if (!card) {
@@ -92,7 +98,7 @@ export const deletelikeCard = async (req: UserRequest, res: Response, next: Next
     const card = await Card.findByIdAndUpdate(
       cardId,
       { $pull: { likes: userId } },
-      { new: true }
+      { new: true },
     );
 
     if (!card) {
