@@ -54,7 +54,7 @@ const userSchema = new mongoose.Schema<User>(
     },
   },
 
-  { versionKey: false }
+  { versionKey: false },
 );
 
 export default mongoose.model<User>('user', userSchema);

@@ -60,7 +60,7 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
     if (err.name === 'CastError') {
       return next(new errors.Error(errors.badRequestError, 'Некорректный id пользователя'));
     } else {
-      next(err);
+      return next(err);
     }
   }
 };
@@ -74,7 +74,7 @@ export const updateUser = async (req: UserRequest, res: Response, next: NextFunc
     const user = await User.findByIdAndUpdate(
       id,
       { name, about },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!user) {
@@ -104,7 +104,7 @@ export const updateAvatar = async (req: UserRequest, res: Response, next: NextFu
     const user = await User.findByIdAndUpdate(
       id,
       { avatar },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!user) {
@@ -136,7 +136,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     const token = jwt.sign({ _id: user._id }, 'secret-key', { expiresIn: '7d' });
-    console.log(user.password);
     return bcrypt
       .compare(password, user.password)
       .then((matched) => {

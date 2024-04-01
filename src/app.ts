@@ -1,13 +1,13 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import helmet from 'helmet';
+import { errors } from 'celebrate';
 import userRouter from './routes/users';
 import cardRouter from './routes/cards';
 import signInUp from './routes/signUpIn';
 import error, { notFoundAdress } from './middlewares/error';
 import auth from './middlewares/auth';
 import logger from './middlewares/logger';
-import { errors } from 'celebrate';
 
 const { PORT = 3000 } = process.env;
 const app = express();

@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import validator from 'validator';
 import validation from '../utils/validation';
 
 interface Card {
@@ -41,7 +40,7 @@ const cardScheme = new mongoose.Schema<Card>(
       default: Date.now,
     },
   },
-  { versionKey: false }
+  { versionKey: false },
 );
 
 export default mongoose.model<Card>('card', cardScheme);
