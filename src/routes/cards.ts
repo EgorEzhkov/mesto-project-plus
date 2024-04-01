@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import validation from '../utils/validation';
 import {
   createCard,
   deleteCard,
@@ -9,9 +10,9 @@ import {
 
 const router = Router();
 
-router.post('/cards', createCard);
+router.post('/cards', validation.createCardValidation, createCard);
 router.get('/cards', getCards);
-router.delete('/cards/:cardId', deleteCard);
+router.delete('/cards/:cardId', validation.deleteCardValidation, deleteCard);
 router.put('/cards/:cardId/likes', likeCard);
 router.delete('/cards/:cardId/likes', deletelikeCard);
 
