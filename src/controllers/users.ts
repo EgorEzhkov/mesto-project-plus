@@ -9,9 +9,9 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
   const { name, about, avatar, email, password } = req.body;
 
   try {
-    const user = await bcrypt
-      .hash(password, 10)
-      .then((hash) => User.create({ name, about, avatar, email, password: hash }));
+    const passwordHashed = await bcrypt.hash(password, 10);
+
+    const user = await User.create({ name, about, avatar, email, password: passwordHashed });
 
     return res.status(201).send({ data: user });
   } catch (err: any) {
