@@ -10,14 +10,10 @@ export const createCard = async (req: UserRequest, res: Response, next: NextFunc
   try {
     const card = await Card.create({ name, link, owner });
 
-    if (!name || !link) {
-      throw new errors.Error(errors.badRequestError, 'Некорректные данные');
-    }
-
     return res.status(201).send({ data: card });
   } catch (err: any) {
     if (err.name === 'ValidationError') {
-      return next(new errors.Error(errors.badRequestError, 'Некорректые данные'));
+      return next(new errors.ErrorExt(errors.badRequestError, 'Некорректые данные'));
     } else {
       return next(err);
     }
@@ -27,10 +23,6 @@ export const createCard = async (req: UserRequest, res: Response, next: NextFunc
 export const getCards = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const cards = await Card.find({});
-
-    if (!cards || cards.length === 0) {
-      throw new errors.Error(errors.notFoundError, 'Карточки не найдены');
-    }
 
     return res.send({ data: cards });
   } catch (err) {
@@ -45,11 +37,11 @@ export const deleteCard = async (req: UserRequest, res: Response, next: NextFunc
     const card = await Card.findById(cardId);
 
     if (!card) {
-      throw new errors.Error(errors.notFoundError, 'Карточка не найдена');
+      throw new errors.ErrorExt(errors.notFoundError, 'Карточка не найдена');
     }
 
     if (String(card.owner) !== req.user!._id) {
-      throw new errors.Error(errors.logInError, 'У вас нет доступа удалять чужие карточки');
+      throw new errors.ErrorExt(errors.logInError, 'У вас нет доступа удалять чужие карточки');
     }
 
     const cardDeleted = await card.delete();
@@ -57,7 +49,7 @@ export const deleteCard = async (req: UserRequest, res: Response, next: NextFunc
     return res.send({ data: cardDeleted });
   } catch (err: any) {
     if (err.name === 'CastError') {
-      return next(new errors.Error(errors.notFoundError, 'Некорректный id карточки'));
+      return next(new errors.ErrorExt(errors.notFoundError, 'Некорректный id карточки'));
     } else {
       return next(err);
     }
@@ -76,13 +68,13 @@ export const likeCard = async (req: UserRequest, res: Response, next: NextFuncti
     );
 
     if (!card) {
-      throw new errors.Error(errors.notFoundError, 'Карточка не найдена');
+      throw new errors.ErrorExt(errors.notFoundError, 'Карточка не найдена');
     }
 
     return res.send({ data: card });
   } catch (err: any) {
     if (err.name === 'CastError') {
-      return next(new errors.Error(errors.notFoundError, 'Некорректный id карточки'));
+      return next(new errors.ErrorExt(errors.notFoundError, 'Некорректный id карточки'));
     } else {
       return next(err);
     }
@@ -102,13 +94,13 @@ export const deletelikeCard = async (req: UserRequest, res: Response, next: Next
     );
 
     if (!card) {
-      throw new errors.Error(errors.notFoundError, 'Карточка не найдена');
+      throw new errors.ErrorExt(errors.notFoundError, 'Карточка не найдена');
     }
 
     return res.send({ data: card });
   } catch (err: any) {
     if (err.name === 'CastError') {
-      return next(new errors.Error(errors.notFoundError, 'Некорректный id карточки'));
+      return next(new errors.ErrorExt(errors.notFoundError, 'Некорректный id карточки'));
     } else {
       return next(err);
     }

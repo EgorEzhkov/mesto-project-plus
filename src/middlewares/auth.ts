@@ -7,8 +7,7 @@ export default async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { cookie } = req.headers;
 
   if (!cookie?.includes('jwt') || !cookie) {
-    next(new errors.Error(errors.logInError, 'Необходима авторизация!'));
-    return;
+    return next(new errors.ErrorExt(errors.logInError, 'Необходима авторизация!'));
   }
 
   const token = cookie.replace('jwt=', '');
@@ -17,10 +16,10 @@ export default async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     payload = jwt.verify(token, 'secret-key');
   } catch (err) {
-    next(new errors.Error(errors.logInError, 'Необходима авторизация!'));
+    return next(new errors.ErrorExt(errors.logInError, 'Необходима авторизация!'));
   }
 
   req.user = payload;
 
-  next();
+  return next();
 };

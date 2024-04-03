@@ -2,14 +2,13 @@ import express from 'express';
 import mongoose from 'mongoose';
 import helmet from 'helmet';
 import { errors } from 'celebrate';
-import userRouter from './routes/users';
-import cardRouter from './routes/cards';
 import signInUp from './routes/signUpIn';
-import error, { notFoundAdress } from './middlewares/error';
+import error from './middlewares/error';
 import auth from './middlewares/auth';
 import logger from './middlewares/logger';
+import router from './routes/index';
+import config from './config';
 
-const { PORT = 3000 } = process.env;
 const app = express();
 
 mongoose.set('strictQuery', true);
@@ -26,10 +25,7 @@ app.use('/', signInUp);
 
 app.use(auth);
 
-app.use('/', userRouter);
-app.use('/', cardRouter);
-
-app.use('*', notFoundAdress);
+app.use('/', router);
 
 app.use(logger.errorLogger);
 
@@ -37,6 +33,6 @@ app.use(errors());
 
 app.use(error);
 
-app.listen(PORT, () => {
-  console.log(`Порт сервера: ${PORT} `);
+app.listen(config.PORT, () => {
+  console.log(`Порт сервера: ${config.PORT} `);
 });

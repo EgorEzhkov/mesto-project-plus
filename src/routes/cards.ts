@@ -10,10 +10,10 @@ import {
 
 const router = Router();
 
-router.post('/cards', validation.createCardValidation, createCard);
-router.get('/cards', getCards);
-router.delete('/cards/:cardId', validation.deleteCardValidation, deleteCard);
-router.put('/cards/:cardId/likes', likeCard);
-router.delete('/cards/:cardId/likes', deletelikeCard);
+router.post('/', validation.createCardValidation, createCard);
+router.get('/', getCards);
+router.delete('/:cardId', validation.deleteCardValidation, deleteCard);
+router.put('/:cardId/likes', likeCard);
+router.delete('/:cardId/likes', deletelikeCard);
 
 export default router;

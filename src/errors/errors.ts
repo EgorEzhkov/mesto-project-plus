@@ -5,10 +5,11 @@ const notFoundError = 404;
 const defaultError = 500;
 const conflictError = 409;
 
-class Error {
+class ErrorExt extends Error {
   message: string;
   statusCode: number;
   constructor(statusCode: number, message: string) {
+    super(message);
     this.message = message;
     this.statusCode = statusCode;
   }
@@ -19,7 +20,7 @@ export default {
   notFoundError,
   logInError,
   defaultError,
-  Error,
+  ErrorExt,
   forbiddenError,
   conflictError,
 };
