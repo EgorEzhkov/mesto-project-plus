@@ -14,8 +14,8 @@ const error = (
   next();
 };
 
-export const notFoundAdress = (req: Request, res: Response) => {
-  res.status(errors.notFoundError).send({ message: 'Запрашиваемый ресурс не найден' });
+export const notFoundAdress = (req: Request, res: Response, next: NextFunction) => {
+  next(new errors.ErrorExt(errors.notFoundError, 'Запрашиваемый ресурс не найден'));
 };
 
 export default error;

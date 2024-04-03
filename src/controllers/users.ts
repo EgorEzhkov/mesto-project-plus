@@ -13,18 +13,14 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
       .hash(password, 10)
       .then((hash) => User.create({ name, about, avatar, email, password: hash }));
 
-    if (!email || !password) {
-      throw new errors.Error(errors.badRequestError, 'Некорректные данные');
-    }
-
     return res.status(201).send({ data: user });
   } catch (err: any) {
     if (err.name === 'ValidationError') {
-      return next(new errors.Error(errors.badRequestError, 'Некорректные данные')); // обрабатываем ошибку валидации
+      return next(new errors.ErrorExt(errors.badRequestError, 'Некорректные данные')); // обрабатываем ошибку валидации
     } else if (err.message === 'Illegal arguments: undefined, number') {
-      return next(new errors.Error(errors.badRequestError, 'Введите пароль'));
+      return next(new errors.ErrorExt(errors.badRequestError, 'Введите пароль'));
     } else if (err.code === 11000) {
-      return next(new errors.Error(errors.conflictError, 'Email уже существует'));
+      return next(new errors.ErrorExt(errors.conflictError, 'Email уже существует'));
     } else {
       return next(err);
     }
@@ -34,10 +30,6 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const users = await User.find({});
-
-    if (!users || users.length < 1) {
-      throw new errors.Error(errors.notFoundError, 'Пользователи не найдены');
-    }
 
     return res.send({ data: users });
   } catch (err) {
@@ -52,13 +44,13 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
     const user = await User.findById(id);
 
     if (!user) {
-      throw new errors.Error(errors.notFoundError, 'Пользователь не найден');
+      throw new errors.ErrorExt(errors.notFoundError, 'Пользователь не найден');
     }
 
     return res.send({ data: user });
   } catch (err: any) {
     if (err.name === 'CastError') {
-      return next(new errors.Error(errors.badRequestError, 'Некорректный id пользователя'));
+      return next(new errors.ErrorExt(errors.badRequestError, 'Некорректный id пользователя'));
     } else {
       return next(err);
     }
@@ -78,17 +70,13 @@ export const updateUser = async (req: UserRequest, res: Response, next: NextFunc
     );
 
     if (!user) {
-      throw new errors.Error(errors.notFoundError, 'Пользователь не найден');
-    }
-
-    if (!name || !about) {
-      throw new errors.Error(errors.badRequestError, 'Некорректые данные');
+      throw new errors.ErrorExt(errors.notFoundError, 'Пользователь не найден');
     }
 
     return res.send({ data: user });
   } catch (err: any) {
     if (err.name === 'ValidationError') {
-      return next(new errors.Error(errors.badRequestError, 'Некорректные данные')); // обрабатываем ошибку валидации
+      return next(new errors.ErrorExt(errors.badRequestError, 'Некорректные данные')); // обрабатываем ошибку валидации
     } else {
       return next(err);
     }
@@ -108,17 +96,13 @@ export const updateAvatar = async (req: UserRequest, res: Response, next: NextFu
     );
 
     if (!user) {
-      throw new errors.Error(errors.notFoundError, 'Пользователь не найден');
-    }
-
-    if (!avatar) {
-      throw new errors.Error(errors.badRequestError, 'Некорректые данные');
+      throw new errors.ErrorExt(errors.notFoundError, 'Пользователь не найден');
     }
 
     return res.send({ data: user });
   } catch (err: any) {
     if (err.name === 'ValidationError') {
-      return next(new errors.Error(errors.badRequestError, 'Некорректные данные')); // обрабатываем ошибку валидации
+      return next(new errors.ErrorExt(errors.badRequestError, 'Некорректные данные')); // обрабатываем ошибку валидации
     } else {
       return next(err);
     }
@@ -132,7 +116,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
-      throw new errors.Error(errors.logInError, 'Неверный логин или пароль');
+      throw new errors.ErrorExt(errors.logInError, 'Неверный логин или пароль');
     }
 
     const token = jwt.sign({ _id: user._id }, 'secret-key', { expiresIn: '7d' });
@@ -140,7 +124,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       .compare(password, user.password)
       .then((matched) => {
         if (!matched) {
-          throw new errors.Error(errors.logInError, 'Неверный логин или пароль');
+          throw new errors.ErrorExt(errors.logInError, 'Неверный логин или пароль');
         }
         res
           .cookie('jwt', token, {
@@ -151,7 +135,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       })
       .catch((err) => {
         if (err.message === 'Illegal arguments: undefined, string') {
-          return next(new errors.Error(errors.badRequestError, 'Введите пароль'));
+          return next(new errors.ErrorExt(errors.badRequestError, 'Введите пароль'));
         } else {
           return next(err);
         }
@@ -168,7 +152,7 @@ export const getUser = async (req: UserRequest, res: Response, next: NextFunctio
     const user = await User.findById(_id);
 
     if (!user) {
-      throw new errors.Error(errors.notFoundError, 'Пользователь не найден');
+      throw new errors.ErrorExt(errors.notFoundError, 'Пользователь не найден');
     }
 
     res.send({ info: user });
