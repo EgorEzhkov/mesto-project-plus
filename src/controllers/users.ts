@@ -17,8 +17,6 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
   } catch (err: any) {
     if (err.name === 'ValidationError') {
       return next(new errors.ErrorExt(errors.badRequestError, 'Некорректные данные')); // обрабатываем ошибку валидации
-    } else if (err.message === 'Illegal arguments: undefined, number') {
-      return next(new errors.ErrorExt(errors.badRequestError, 'Введите пароль'));
     } else if (err.code === 11000) {
       return next(new errors.ErrorExt(errors.conflictError, 'Email уже существует'));
     } else {
